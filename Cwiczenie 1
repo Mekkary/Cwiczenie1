@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Obliczenia na polach</title>
+
+</head>
+<body>
+    <h1>Obliczenia na polach</h1>
+
+    <div class="formularz">
+        <div class="pole">
+            <label for="pole1">Pole 1:</label>
+            <input type="number" id="pole1" class="pole-wejsciowe" value="0">
+        </div>
+        <div class="pole">
+            <label for="pole2">Pole 2:</label>
+            <input type="number" id="pole2" class="pole-wejsciowe" value="0">
+        </div>
+        <div class="pole">
+            <label for="pole3">Pole 3:</label>
+            <input type="number" id="pole3" class="pole-wejsciowe" value="0">
+        </div>
+        <div class="pole">
+            <label for="pole4">Pole 4:</label>
+            <input type="number" id="pole4" class="pole-wejsciowe" value="0">
+        </div>
+    </div>
+
+    <div class="wyniki">
+        <p>Suma: <span id="suma">0</span></p>
+        <p>Średnia: <span id="srednia">0</span></p>
+        <p>Minimum: <span id="minimum">0</span></p>
+        <p>Maksimum: <span id="maksimum">0</span></p>
+    </div>
+
+    <script>
+        function aktualizujWyniki() {
+            const pola = document.querySelectorAll('.pole-wejsciowe');
+            const wartosci = Array.from(pola).map(pole => Number(pole.value));
+
+            const suma = wartosci.reduce((a, b) => a + b, 0);
+            const srednia = (suma / wartosci.length).toFixed(2);
+            const minimum = Math.min(...wartosci);
+            const maksimum = Math.max(...wartosci);
+
+            document.getElementById('suma').textContent = suma;
+            document.getElementById('srednia').textContent = srednia;
+            document.getElementById('minimum').textContent = minimum;
+            document.getElementById('maksimum').textContent = maksimum;
+        }
+
+        document.querySelectorAll('.pole-wejsciowe').forEach(pole => {
+            pole.addEventListener('input', aktualizujWyniki);
+        });
+
+        
+        aktualizujWyniki();
+    </script>
+</body>
+</html>
