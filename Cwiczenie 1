@@ -3,32 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Obliczenia na polach</title>
+    <title>Dynamiczne Pola i Obliczenia</title>
 
 </head>
 <body>
-    <h1>Obliczenia na polach</h1>
+    <h1>Dynamiczne Pola i Obliczenia</h1>
 
-    <div class="formularz">
-        <div class="pole">
-            <label for="pole1">Pole 1:</label>
-            <input type="number" id="pole1" class="pole-wejsciowe" value="0">
-        </div>
-        <div class="pole">
-            <label for="pole2">Pole 2:</label>
-            <input type="number" id="pole2" class="pole-wejsciowe" value="0">
-        </div>
-        <div class="pole">
-            <label for="pole3">Pole 3:</label>
-            <input type="number" id="pole3" class="pole-wejsciowe" value="0">
-        </div>
-        <div class="pole">
-            <label for="pole4">Pole 4:</label>
-            <input type="number" id="pole4" class="pole-wejsciowe" value="0">
-        </div>
+    <div class="pole-dodawania">
+        <label for="liczba-pole">Ile pól dodać?</label>
+        <input type="number" id="liczba-pole" min="1" value="1">
+        <button id="dodaj-pola">Dodaj Pola</button>
     </div>
 
+    <div id="formularz" class="formularz"></div>
+
     <div class="wyniki">
+        <p class="oczekiwanie" id="oczekiwanie" style="display:none;">Przetwarzanie...</p>
         <p>Suma: <span id="suma">0</span></p>
         <p>Średnia: <span id="srednia">0</span></p>
         <p>Minimum: <span id="minimum">0</span></p>
@@ -36,27 +26,81 @@
     </div>
 
     <script>
-        function aktualizujWyniki() {
-            const pola = document.querySelectorAll('.pole-wejsciowe');
-            const wartosci = Array.from(pola).map(pole => Number(pole.value));
+        class DynamicznePola {
+            constructor() {
+                this.formularz = document.getElementById('formularz');
+                this.dodajPolaBtn = document.getElementById('dodaj-pola');
+                this.liczbaPoleInput = document.getElementById('liczba-pole');
+                this.wyniki = {
+                    suma: document.getElementById('suma'),
+                    srednia: document.getElementById('srednia'),
+                    minimum: document.getElementById('minimum'),
+                    maksimum: document.getElementById('maksimum'),
+                    oczekiwanie: document.getElementById('oczekiwanie')
+                };
+                this.inicjalizuj();
+            }
 
-            const suma = wartosci.reduce((a, b) => a + b, 0);
-            const srednia = (suma / wartosci.length).toFixed(2);
-            const minimum = Math.min(...wartosci);
-            const maksimum = Math.max(...wartosci);
+            inicjalizuj() {
+                this.dodajPolaBtn.addEventListener('click', () => this.dodajPola());
+            }
 
-            document.getElementById('suma').textContent = suma;
-            document.getElementById('srednia').textContent = srednia;
-            document.getElementById('minimum').textContent = minimum;
-            document.getElementById('maksimum').textContent = maksimum;
+            dodajPola() {
+                const liczbaPol = Number(this.liczbaPoleInput.value);
+                if (liczbaPol > 0) {
+                    for (let i = 0; i < liczbaPol; i++) {
+                        this.stworzPole();
+                    }
+                }
+            }
+
+            stworzPole() {
+                const kontener = document.createElement('div');
+                kontener.classList.add('pole');
+
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.value = '0';
+                input.classList.add('pole-wejsciowe');
+                input.addEventListener('input', () => this.zmienWyniki());
+                input.addEventListener('blur', () => this.aktualizujWyniki());
+
+                const usunBtn = document.createElement('button');
+                usunBtn.textContent = 'Usuń';
+                usunBtn.classList.add('usun');
+                usunBtn.addEventListener('click', () => kontener.remove());
+
+                kontener.appendChild(input);
+                kontener.appendChild(usunBtn);
+                this.formularz.appendChild(kontener);
+
+                this.aktualizujWyniki();
+            }
+
+            zmienWyniki() {
+                this.wyniki.oczekiwanie.style.display = 'block';
+            }
+
+            aktualizujWyniki() {
+                const wartosci = Array.from(document.querySelectorAll('.pole-wejsciowe')).map(pole => Number(pole.value));
+                if (wartosci.length === 0) return;
+
+                const suma = wartosci.reduce((a, b) => a + b, 0);
+                const srednia = (suma / wartosci.length).toFixed(2);
+                const minimum = Math.min(...wartosci);
+                const maksimum = Math.max(...wartosci);
+
+                this.wyniki.suma.textContent = suma;
+                this.wyniki.srednia.textContent = srednia;
+                this.wyniki.minimum.textContent = minimum;
+                this.wyniki.maksimum.textContent = maksimum;
+
+                this.wyniki.oczekiwanie.style.display = 'none';
+            }
         }
 
-        document.querySelectorAll('.pole-wejsciowe').forEach(pole => {
-            pole.addEventListener('input', aktualizujWyniki);
-        });
-
         
-        aktualizujWyniki();
+        new DynamicznePola();
     </script>
 </body>
 </html>
